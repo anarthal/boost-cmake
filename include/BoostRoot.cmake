@@ -255,9 +255,11 @@ if (BOOST_CXX20_MODULE)
     target_compile_definitions(${TARGET_NAME} PUBLIC BOOST_CXX20_MODULE)
 
     # Most libraries implement the module by including its own headers in the module purview.
-    # clang will complain if it sees an #include <xxx> in the module purview.
+    # Some compilers complain if they see an #include <xxx> in the module purview.
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       target_compile_options(${TARGET_NAME} PRIVATE -Wno-include-angled-in-module-purview)
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+      target_compile_options(${TARGET_NAME} PRIVATE /wd5244)
     endif()
   endfunction()
 endif()
