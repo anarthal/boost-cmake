@@ -242,28 +242,6 @@ endmacro()
 # C++20 modules
 option(BOOST_USE_MODULES "Build Boost as a collection of C++20 modules (unstable)" OFF)
 
-# Define a helper function to set options for targets that implement modules
-if (BOOST_USE_MODULES)
-  function (boost_set_cxx20_module_settings TARGET_NAME)
-    # All modules use import std, which requires C++23, and this should propagate
-    target_compile_features(${TARGET_NAME} PUBLIC cxx_std_23)
-
-    # Enable import std
-    set_target_properties(${TARGET_NAME} PROPERTIES CXX_MODULE_STD 1)
-
-    # C++ code uses this macro to determine whether we're using modules or not. Should propagate
-    target_compile_definitions(${TARGET_NAME} PUBLIC BOOST_USE_MODULES)
-
-    # Most libraries implement the module by including its own headers in the module purview.
-    # Some compilers complain if they see an #include <xxx> in the module purview.
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      target_compile_options(${TARGET_NAME} PRIVATE -Wno-include-angled-in-module-purview)
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-      target_compile_options(${TARGET_NAME} PRIVATE /wd5244)
-    endif()
-  endfunction()
-endif()
-
 #
 
 file(GLOB __boost_libraries RELATIVE "${BOOST_SUPERPROJECT_SOURCE_DIR}/libs" "${BOOST_SUPERPROJECT_SOURCE_DIR}/libs/*/CMakeLists.txt" "${BOOST_SUPERPROJECT_SOURCE_DIR}/libs/numeric/*/CMakeLists.txt")
